@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSSS Gopinath Ka Gada - Master Board</title>
+    
+    <script id="permanentData" type="application/json"></script>
+
+    <style>
+        /* =========================================
+           GLOBAL VARIABLES & RESET
+           ========================================= */
+        :root {
+            --gold: #ffcc00; 
+            --red: #ff3b3b; 
+            --blue: #001d3d;
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+        }
+        
+        ::-webkit-scrollbar { 
+            display: none; 
+        }
+        
+        /* Cursor blinking issue solved with user-select: none */
+        body { 
+            background: #000; 
+            width: 100vw; 
+            height: 100vh; 
+            overflow: hidden; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            cursor: default; 
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+
+        body.mouse-active {
+            cursor: default;
+        }
+
+        /* =========================================
+           1. HEADER 
+           ========================================= */
+        .header-top {
+            flex: 0 0 10vh;
+            background: linear-gradient(90deg, #050510, #001d3d, #050510); 
+            color: var(--gold); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 1vh 3vw; 
+            border-bottom: 0.5vh solid var(--gold); 
+            z-index: 100;
+        }
+        
+        .header-title { 
+            font-size: 2.5vw; 
+            font-weight: 800; 
+            letter-spacing: 0.05vw; 
+            cursor: pointer; 
+            text-align: center; 
+            text-shadow: 0 0.5vh 1vh #000;
+        }
+
+        /* =========================================
+           2. MAIN DISPLAY & SLIDES
+           ========================================= */
+        .main-display { 
+            flex: 0 0 79vh; 
+            position: relative; 
+            overflow: hidden; 
+            background: #000; 
+        }
+
+        .slide { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            opacity: 0; 
+            visibility: hidden; 
+            transform: scale(1.05); 
+            /*filter: blur(0px); */
+            transition: opacity 1.2s ease, transform 1.2s ease; 
+            z-index: 1; 
+        }
+        
+        .slide.active { 
+            opacity: 1; 
+            visibility: visible; 
+            transform: scale(1); 
+            /* filter: blur(0px); */
+            z-index: 5; 
+        }
+
+        .video-full { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            background: #000; 
+            pointer-events: none; 
+        }
+
+        /* WELCOME SLIDE IMAGE */
+        .img-full {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 10s linear; 
+        }
+        .slide.active .img-full {
+            transform: scale(1.15);
+        }
+
+        /* ERROR MESSAGE OVERLAY */
+        .vid-error-msg {
+            display: none; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85); 
+            color: var(--red); 
+            border: 2px solid var(--red);
+            padding: 3vh 3vw; 
+            border-radius: 2vh; 
+            text-align: center; 
+            z-index: 20; 
+            font-size: 2.5vw; 
+            font-weight: bold;
+        }
+        
+        .vid-error-sub { 
+            color: #fff; 
+            font-size: 1.5vw; 
+            font-weight: normal; 
+            margin-top: 1vh; 
+        }
+
+        /* =========================================
+           3. SLIDE SPECIFIC DESIGNS
+           ========================================= */
+           
+        /* PRIDE SLIDE */
+        .pride-wrap { 
+            height: 100%; 
+            background: linear-gradient(to bottom, rgba(0, 25, 50, 0.8), rgba(0, 0, 0, 0.95)), url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1920') center/cover; 
+            padding: 2vh 5vw; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        .pride-title { font-size: 3.5vw; color: var(--gold); text-align: center; text-transform: uppercase; margin-bottom: 1.5vh; }
+        .class-heading { font-size: 1.8vw; color: #fff; border-bottom: 2px solid var(--red); padding-bottom: 0.5vh; margin-bottom: 1.5vh; display: inline-block; }
+        
+        /* FIXED FOR >5 TOPPERS: Horizontal Scroll Layout */
+        .pride-grid { width: 100%; overflow: hidden; }
+        .pride-card { width: 16vw; flex-shrink: 0; background: rgba(255,255,255,0.08); padding: 1vh; border-radius: 2vh; border: 1px solid var(--gold); text-align: center; backdrop-filter: blur(5px); }
+        .pride-card img { width: 6vw; height: 6vw; border-radius: 50%; border: 0.3vw solid #fff; margin-bottom: 0.5vh; object-fit: cover; }
+        .pride-card h3 { font-size: 1.2vw; margin-bottom: 0.2vh;}
+        .pride-card .sub-text { font-size: 0.8vw; color: #ccc; }
+        .pride-card .perc { font-size: 1.6vw; color: var(--gold); font-weight: 900; margin-top: 0.5vh; }
+
+        /* BHAMASHAH SLIDE */
+        .bhamashah-wrap { 
+            height: 100%; 
+            background: linear-gradient(to bottom, rgba(30, 20, 0, 0.8), rgba(0, 0, 0, 0.95)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920') center/cover; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: relative; 
+        }
+        .scroll-container { flex: 1; width: 100%; position: relative; overflow: hidden; }
+        .scroll-box { position: absolute; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        @keyframes scrollUpDynamic { from { transform: translateY(79vh); } to { transform: translateY(-100%); } }
+        .bhamashah-card { background: rgba(255, 204, 0, 0.08); border: 2px solid rgba(255, 204, 0, 0.3); border-left: 1vw solid var(--gold); padding: 2.5vh 4vw; margin: 1.5vh 0; width: 85%; border-radius: 2vh; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1vh 3vh rgba(0,0,0,0.6); }
+        .b-name { font-size: 3.2vw; color: #fff; font-weight: 900; text-align: left; text-shadow: 0 0.5vh 1vh #000; letter-spacing: 0.1vw; }
+        .b-amount { font-size: 2.8vw; color: var(--gold); font-weight: 900; text-align: right; background: rgba(0,0,0,0.8); padding: 1.5vh 2.5vw; border-radius: 1.5vh; border: 1px solid rgba(255, 204, 0, 0.2); }
+
+        /* LEGACY SLIDE */
+        .legacy-wrap { 
+            height: 100%; 
+            background: linear-gradient(to bottom, rgba(0, 15, 35, 0.85), rgba(0, 0, 0, 0.95)), url('https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?q=80&w=1920') center/cover; 
+            padding: 4vh 10vw; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .legacy-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.08); border-radius: 2vh; overflow: hidden; box-shadow: 0 2vh 5vh rgba(0,0,0,0.8); }
+        .legacy-table th { background: rgba(0, 29, 61, 0.9); color: var(--gold); font-size: 1.5vw; padding: 1.5vh; text-align: left; border-bottom: 2px solid var(--gold); }
+        .legacy-table td { font-size: 1.3vw; padding: 1.2vh 1.5vh; border-bottom: 1px solid rgba(255,255,255,0.1); color: #fff; }
+        .present-row { background: rgba(255, 59, 59, 0.3) !important; color: var(--gold) !important; font-weight: bold; border-left: 1vw solid var(--red); }
+
+        /* STATS SLIDE - FIXED LAYOUT */
+        .stats-wrap { 
+            height: 100%; 
+            background: linear-gradient(to bottom, #050505, #111); 
+            padding: 4vh 5vw; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 3vh; 
+        }
+        .stat-card { 
+            background: rgba(255,255,255,0.08); 
+            border: 1px solid rgba(255,255,255,0.2); 
+            padding: 3vh 2vw; 
+            border-radius: 3vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            text-align: center;
+            gap: 1vh; 
+        }
+        .stat-val { font-size: clamp(2vw, 3.5vw, 4.5vw); font-weight: 900; color: var(--gold); word-break: break-word; line-height: 1.2;}
+        .stat-lbl { font-size: 1.8vw; color: #fff; font-weight: bold; }
+
+        /* UPCOMING EVENTS SLIDE */
+        .events-wrap { 
+            height: 100%; 
+            background: #000; 
+            padding: 4vh 5vw; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        .event-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 2vh; 
+        }
+        .event-item { 
+            background: linear-gradient(90deg, var(--blue), transparent); 
+            padding: 2vh 3vw; 
+            border-left: 0.8vw solid var(--red); 
+            border-radius: 1vh; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .event-name { font-size: 2.5vw; font-weight: 700; color: #fff; }
+        .event-date { font-size: 2vw; color: var(--gold); font-weight: bold; }
+
+        /* STAFF SLIDE */
+        .staff-section { 
+            height: 100%; 
+            background: #eef2f5; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 2vh 4vw; 
+            position: relative;
+        }
+        #staffIntroOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,29,61,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1920') center/cover; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s ease-in-out; }
+        .intro-title { font-size: 5vw; color: var(--gold); text-transform: uppercase; margin-bottom: 2vh; text-shadow: 0 1vh 3vh #000; text-align: center;}
+        .intro-sub { font-size: 2vw; color: #fff; text-shadow: 0 0.5vh 1vh #000; text-align: center;}
+        .emp-nav { flex: 0 0 13vh; display: flex; gap: 1vw; overflow-x: auto; padding: 1vh 0; scroll-behavior: smooth; z-index: 10; }
+        .emp-mini { background: #fff; min-width: 8vw; padding: 1vh; border-radius: 1.5vh; text-align: center; border: 0.3vw solid transparent; transition: 0.3s; color: #000;}
+        .emp-mini.active { border-color: var(--red); transform: translateY(-0.5vh); }
+        .emp-mini img { width: 3.5vw; height: 3.5vw; border-radius: 50%; object-fit: cover; }
+        .detail-card { flex: 1; display: grid; grid-template-columns: 28% 72%; gap: 3vw; background: #fff; border-radius: 3vh; padding: 3vh; align-items: center; overflow: hidden; color: #000; z-index: 10;}
+        .big-img { width: 18vw; height: 18vw; border-radius: 50%; border: 0.8vw solid #f8f9fa; object-fit: cover; position: relative; z-index: 10;}
+        .img-bday-glow { border-color: var(--gold) !important; box-shadow: 0 0 3vh var(--gold); }
+        .emp-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1vw; z-index: 10;}
+        .info-item { background: #f8f9fa; padding: 1vh 1.5vw; border-radius: 1vh; border-left: 0.4vw solid var(--blue); display: flex; flex-direction: column; }
+        .info-item label { font-size: 0.9vw; color: #888; font-weight: 600; }
+        .info-item span { font-size: 1.2vw; color: #222; font-weight: 700; }
+        .bday-tag { background: var(--gold); color: #000; padding: 1vh; border-radius: 2vh; font-weight: 900; font-size: 1.4vw; text-align: center; margin-top: 1.5vh; display: none; z-index: 10; position: relative;}
+
+        /* BIRTHDAY CONFETTI ANIMATION */
+        #confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 5; }
+        .confetti { position: absolute; width: 1vw; height: 1vh; top: -5vh; animation: fall linear forwards; border-radius: 2px; }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1;}
+            100% { transform: translateY(80vh) rotate(720deg); opacity: 0;}
+        }
+
+        /* GALLERY SLIDE - UPDATED FOR CAPTIONS */
+        .gallery-wrap { 
+            height: 100%; 
+            padding: 2vh 5vw; 
+            background: linear-gradient(to bottom, #00152a, #000); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+        }
+        .gallery-showcase { 
+            flex: 1; 
+            position: relative; 
+            overflow: hidden; 
+            border-radius: 2vh; 
+            border: 2px solid var(--gold); 
+            box-shadow: 0 1vh 3vh rgba(0,0,0,0.8); 
+            background: #000;
+        }
+        .gallery-item {
+            position: absolute; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            opacity: 0; 
+            visibility: hidden;
+            transition: opacity 1s ease; 
+            overflow: hidden;
+        }
+        .gallery-item.active { 
+            opacity: 1; 
+            visibility: visible; 
+            z-index: 2; 
+        }
+        .gallery-photo { 
+            width: 100%; height: 100%; object-fit: cover; 
+            transform: scale(1) translate(0, 0); 
+            transition: transform 15s linear; 
+        }
+        .gallery-item.active .gallery-photo { 
+            transform: scale(1.15) translate(-2%, -2%); 
+        }
+        /* GALLERY CAPTION BOX */
+        .gallery-caption {
+            position: absolute; 
+            bottom: 4vh; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: rgba(0, 29, 61, 0.85); 
+            color: var(--gold);
+            padding: 1.5vh 3vw; 
+            border-radius: 1.5vh; 
+            border: 2px solid var(--gold);
+            font-size: 2.5vw; 
+            font-weight: bold; 
+            text-shadow: 0 0.5vh 1vh #000;
+            box-shadow: 0 1vh 2vh rgba(0,0,0,0.8);
+            white-space: nowrap;
+            opacity: 0; /* Hidden initially for animation */
+        }
+        .gallery-item.active .gallery-caption {
+            animation: slideUpFade 1s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        
+        /* CREDITS SLIDE */
+        .end-wrap { 
+            height: 100%; 
+            background: linear-gradient(to bottom, rgba(40, 0, 10, 0.7), rgba(0, 0, 0, 0.95)), url('https://images.unsplash.com/photo-1485001564903-56e6a54fae6d?q=80&w=1920') center/cover; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .name-hd { font-size: 6vw; font-weight: 900; color: #fff; white-space: nowrap; text-shadow: 0 0 2vw rgba(255, 59, 59, 0.6); border-bottom: 0.5vh solid var(--red); padding-bottom: 2vh; }
+
+        /* =========================================
+           4. NEWS TICKER, CLOCK & FOOTER
+           ========================================= */
+        .news-ticker {
+            flex: 0 0 6vh; 
+            background: var(--red); 
+            color: white; 
+            display: flex; 
+            align-items: center;
+            font-size: 1.8vw; 
+            font-weight: bold; 
+            letter-spacing: 0.1vw; 
+            z-index: 100; 
+            position: relative;
+        }
+        .news-label { 
+            background: #000; 
+            color: var(--gold); 
+            padding: 0 2vw; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            z-index: 10; 
+            border-right: 2px solid var(--gold);
+        }
+        marquee { 
+            flex: 1; 
+            padding: 0 1vw; 
+            display: flex; 
+            align-items: center; 
+            height: 100%;
+        }
+        
+        .header-clock { 
+            background: #000; 
+            color: #fff; 
+            padding: 0 2vw; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            z-index: 10; 
+            border-left: 2px solid var(--gold);
+            font-size: 1.2vw; 
+            line-height: 1.2; 
+            font-family: monospace; 
+            white-space: nowrap; 
+            text-shadow: 0 2px 4px #000;
+        }
+        .clock-time { color: var(--gold); font-size: 1.8vw; font-weight: 900;}
+
+        /* PROGRESS BAR HIDDEN AS REQUESTED */
+        .progress-bar-bg { 
+            position: absolute; 
+            display: none; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 3px; 
+            background: rgba(0,0,0,0.4); 
+            z-index: 200; 
+            pointer-events: none; 
+        }
+        .progress-bar-fill { 
+            height: 100%; 
+            width: 0%; 
+            background: lightgray; 
+            transition: width 0.1s linear; 
+        }
+
+        .footer-bottom {
+            flex: 0 0 5vh;
+            background: linear-gradient(90deg, #050505, #111, #050505); 
+            color: #ddd; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.2vw; 
+            font-weight: 600; 
+            border-top: 0.2vh solid rgba(255, 255, 255, 0.2); 
+            z-index: 100;
+        }
+
+        #fsBtn {
+            position: fixed; 
+            bottom: 12vh; 
+            right: 2vw; 
+            background: rgba(255, 59, 59, 0.7); 
+            color: white; 
+            border: none; 
+            padding: 1vh 1.5vw; 
+            border-radius: 1vh; 
+            font-size: 1vw; 
+            font-weight: bold; 
+            cursor: pointer; 
+            z-index: 2000;
+            opacity: 0; 
+            transition: opacity 0.5s;
+        }
+        body.mouse-active #fsBtn { opacity: 1; }
+
+        /* =========================================
+           5. AUTO-HIDE HUD (VOLUME CONTROLS ONLY)
+           ========================================= */
+        .hud-container {
+            position: fixed; 
+            bottom: 12vh; 
+            left: 2vw; 
+            z-index: 1500;
+            display: flex; 
+            align-items: center; 
+            opacity: 0; 
+            transition: opacity 0.5s ease; 
+            pointer-events: none; 
+        }
+        .hud-container.show { opacity: 1; }
+        
+        .vol-box {
+            display: flex; 
+            align-items: center; 
+            gap: 1vw; 
+            background: rgba(0,0,0,0.5);
+            padding: 1vh 1.5vw; 
+            border-radius: 3vh; 
+            border: 1px solid rgba(200, 200, 200, 0.4);
+            backdrop-filter: blur(5px); 
+            pointer-events: auto; 
+        }
+        .vol-icon { font-size: 1.5vw; color: #fff; }
+        .vol-slider { width: 8vw; accent-color: lightgray; cursor: pointer; }
+
+        /* =========================================
+           6. ADMIN PANEL (FULLY RESTORED & EXPANDED)
+           ========================================= */
+        #adminPanel { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(0,0,0,0.98); 
+            z-index: 9999; 
+            display: none; 
+            flex-direction: column; 
+            padding: 3vh 3vw; 
+            color: white; 
+            overflow-y: auto;
+			overflow-x: hidden;
+        }
+        .admin-tabs { 
+            display: flex; 
+            gap: 0.5vw; 
+            margin-bottom: 1.5vh; 
+            flex-wrap: wrap; 
+        }
+        .admin-tab { 
+            padding: 1vh 1.5vw; 
+            background: #333; 
+            color: #fff; 
+            border: none; 
+            border-radius: 0.5vh; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        .admin-tab.active { 
+            background: var(--red); 
+        }
+        .admin-content { 
+			flex: 1; 
+			background: #111; 
+			padding: 1.5vh; 
+			border-radius: 1vh; 
+			display: none; 
+			overflow-x: auto; 
+			overflow-y: auto;
+			width: 100%;      
+			max-width: 100%;
+			min-width: 0;
+		}
+        .admin-content.active { 
+            display: block; 
+        }
+        
+        .admin-data-table { 
+			width: 100%; 
+			min-width: 1500px; /* यह टेबल को सिकुड़ने नहीं देगा, नाम के बॉक्स बड़े रहेंगे */
+			border-collapse: collapse; 
+		}
+        .admin-data-table th { 
+			background: #333; /* डार्क बैकग्राउंड ताकि पीछे का टेक्स्ट न दिखे */
+			color: var(--gold); 
+			padding: 1.5vh 1vh; 
+			text-align: left; 
+			border-bottom: 2px solid var(--gold);
+			/* ध्यान दें: position: sticky यहाँ से हटा दिया गया है ताकि हेडर अपनी जगह न छोड़े */
+		}
+        .admin-data-table td { 
+			padding: 0.8vh 0.5vh; 
+			border-bottom: 1px solid #222;
+		}
+        .admin-data-table td:nth-child(1) .admin-input {
+			min-width: 180px; 
+		}
+        .admin-input { 
+            width: 100%; 
+            padding: 0.8vh; 
+            background: #222; 
+            color: #fff; 
+            border: 1px solid #444; 
+            border-radius: 0.5vh; 
+        }
+        
+        .admin-btns { 
+            display: flex; 
+            gap: 1vw; 
+            margin-top: 2vh; 
+        }
+        .btn-blue { 
+            background: #007bff; 
+            color: white; 
+            padding: 1vh 2vw; 
+            border-radius: 0.5vh; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+
+        .timing-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 1vw; 
+            margin-bottom: 2vh; 
+            background: #222; 
+            padding: 2vh; 
+            border-radius: 1vh;
+        }
+        .timing-row label { flex: 1; font-size: 1.2vw; font-weight: bold;}
+        .timing-row input { 
+            width: 10vw; 
+            padding: 1vh; 
+            text-align: center; 
+            font-size: 1.2vw; 
+            font-weight: bold; 
+            background: #333; 
+            color: #fff; 
+            border: 1px solid #555; 
+            border-radius: 0.5vh;
+        }
+		#backupFileInput { display: none; }
+		.img-preview { width: 4vh; height: 4vh; object-fit: cover; border-radius: 50%; vertical-align: middle; margin-right: 1vw; }
+
+		/* 1. पूरे डब्बे को पारदर्शी (Transparent) करने के लिए */
+		.file-upload-btn { 
+			width: 110px; 
+			color: transparent; /* "No file chosen" को छुपाने के लिए */
+			background: transparent;
+			border: none;
+			outline: none;
+		}
+
+		/* 2. सिर्फ 'Choose File' बटन का नया डिज़ाइन */
+		.file-upload-btn::-webkit-file-upload-button {
+			visibility: visible;
+			color: #fff;
+			background: #007bff; /* नीला रंग */
+			padding: 0.8vh 1vw;
+			border-radius: 0.5vh;
+			border: none;
+			cursor: pointer;
+			font-weight: bold;
+		}		
+		
+    /* Text Animation */
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide.active .pride-title, 
+        .slide.active .b-title, 
+        .slide.active .intro-title {
+            animation: slideUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="background_music.mp3" type="audio/mpeg">
+    </audio>
+    <div class="slide active" id="s0">
+            <img src="welcome.jpg" class="img-full" onerror="this.src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1920'">
+        </div>
+
+    <div class="hud-container" id="hudContainer" onclick="event.stopPropagation()">
+        <div class="vol-box">
+            <span class="vol-icon" id="volIcon">🔊</span>
+            <input type="range" id="volSlider" class="vol-slider" min="0" max="100" value="100" oninput="changeVolume(this.value)">
+        </div>
+    </div>
+
+    <button id="fsBtn" onclick="toggleFullScreen(); event.stopPropagation();">⛶ Full Screen</button>
+
+    <div class="header-top">
+        <div class="header-title" 
+     ondblclick="openAdmin(); event.stopPropagation();" 
+     ontouchstart="adminTouchTimer = setTimeout(() => openAdmin(), 2500);" 
+     ontouchend="clearTimeout(adminTouchTimer);" 
+     title="एडमिन पैनल के लिए डबल क्लिक या 3 सेकंड दबाकर रखें">
+    राजकीय उच्च माध्यमिक विद्यालय गोपीनाथ का गडा, ब्लॉक गढ़ी, जिला बांसवाड़ा (राज.)
+</div>
+    </div>
+
+    <div class="main-display" onclick="togglePlayPause(event)">
+        
+        <div class="slide" id="s1">
+            <div id="v1-error" class="vid-error-msg">⚠️ Error: 'video1.mp4' फाइल नहीं मिली!<br><div class="vid-error-sub">कृपया 'video1.mp4' नाम का वीडियो इसी फोल्डर में रखें।</div></div>
+            <video id="v1" class="video-full" playsinline onended="nextS()" onerror="showVidErr('v1-error')">
+                <source src="video1.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div class="slide" id="s2">
+            <div class="pride-wrap">
+                <h1 class="pride-title">🏆 हमारा गौरव 🏆</h1>
+                <div class="class-section">
+                    <div class="class-heading">कक्षा 12वीं बोर्ड टॉपर्स</div>
+                    <div class="pride-grid" id="pride12Grid"></div>
+                </div>
+                <div class="class-section">
+                    <div class="class-heading">कक्षा 10वीं बोर्ड टॉपर्स</div>
+                    <div class="pride-grid" id="pride10Grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="s3">
+            <div class="bhamashah-wrap">
+                <h1 class="b-title">💎 विद्यालय के भामाशाह</h1>
+                <div class="scroll-container">
+                    <div class="scroll-box" id="donorList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="s4">
+            <div class="legacy-wrap">
+                <h1 class="pride-title" style="color:var(--gold)">विद्यालय नेतृत्व</h1>
+                <div id="legacyContainer" style="width:100%"></div>
+            </div>
+        </div>
+
+        <div class="slide" id="s5">
+            <div class="stats-wrap">
+                <h1 class="pride-title" style="color:#fff;">📊 विद्यालय एक नज़र में</h1>
+                <div class="stats-grid" id="statsGrid"></div>
+            </div>
+        </div>
+
+        <div class="slide" id="s6">
+            <div class="staff-section">
+                <div id="confetti-container"></div>
+                
+                <div id="staffIntroOverlay">
+                    <h1 class="intro-title" style="color:var(--gold);">हमारे समर्पित शिक्षक एवं विद्यालय परिवार</h1>
+                </div>
+
+                <div class="emp-nav" id="staffNav"></div>
+                
+                <div class="detail-card">
+                    <div style="text-align: center;">
+                        <img id="m-img" src="" class="big-img" onerror="this.src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800'">
+                        <div id="m-bday" class="bday-tag">🎂 HAPPY BIRTHDAY!</div>
+                    </div>
+                    <div class="emp-info-grid">
+                        <h2 id="m-name" style="grid-column:1/-1; color:var(--blue); font-size:3vw; border-bottom:2px solid var(--red)">लोड हो रहा है...</h2>
+                        <div class="info-item"><label>कर्मचारी आईडी</label><span id="m-id"></span></div>
+                        <div class="info-item"><label>पहचान पत्र (ID)</label><span id="m-aadhaar"></span></div>
+                        <div class="info-item"><label>पद</label><span id="m-role"></span></div>
+                        <div class="info-item"><label>जन्म तिथि</label><span id="m-dob"></span></div>
+                        <div class="info-item"><label>प्रथम नियुक्ति</label><span id="m-firstAppt"></span></div>
+                        <div class="info-item"><label>विद्यालय में कार्यग्रहण</label><span id="m-schoolJoin"></span></div>
+                        <div class="info-item"><label>सेवा निवृत्ति तिथि</label><span id="m-retire"></span></div>
+                        <div class="info-item"><label>संपर्क सूत्र</label><span id="m-contact"></span></div>
+                        <div class="info-item" style="grid-column:1/-1;"><label>स्थाई पता</label><span id="m-address"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="s7">
+            <div id="v2-error" class="vid-error-msg">⚠️ Error: 'video2.mp4' फाइल नहीं मिली!</div>
+            <video id="v2" class="video-full" playsinline onended="nextS()" onerror="showVidErr('v2-error')">
+                <source src="video2.mp4" type="video/mp4">
+            </video>
+        </div>
+
+          
+        <div class="slide" id="s9">
+            <div class="events-wrap">
+                <h1 class="pride-title" style="color:var(--gold);">📅 आगामी गतिविधियाँ</h1>
+                <div class="event-list" id="eventList"></div>
+            </div>
+        </div>
+
+        <div class="slide" id="s10">
+            <div class="gallery-wrap">
+                <h1 class="pride-title" style="color: #fff; margin-bottom: 2vh;">📸 विद्यालय दर्शन</h1>
+                <div class="gallery-showcase" id="galleryShowcase"></div>
+            </div>
+        </div>
+
+        <div class="slide" id="s8">
+            <div id="v3-error" class="vid-error-msg">⚠️ Error: 'video3.mp4' फाइल नहीं मिली!</div>
+            <video id="v3" class="video-full" playsinline onended="nextS()" onerror="showVidErr('v3-error')">
+                <source src="video3.mp4" type="video/mp4">
+            </video>
+        </div>
+		
+		<div class="slide" id="s11">
+			<div id="v4-error" class="vid-error-msg">⚠️ Error: 'video4.mp4' फाइल नहीं मिली!</div>
+			<video id="v4" class="video-full" playsinline onended="nextS()" onerror="showVidErr('v4-error')">
+				<source src="video4.mp4" type="video/mp4">
+			</video>
+		</div>
+    </div>
+
+    <div class="news-ticker">
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="news-label">सूचना बोर्ड:</div>
+        <marquee id="marqueeText" scrollamount="8"></marquee>
+        <div class="header-clock">
+            <span id="clockDate" style="font-size: 1vw;"></span>
+            <span id="clockTime" class="clock-time"></span>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        NIC Code: 214974 &nbsp;|&nbsp; UDISE+: 08280416908
+    </div>
+
+    <div id="adminPanel" onclick="event.stopPropagation()">
+        <h1>एडमिन पैनल (टेबल व्यू)</h1>
+        
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchTab('tab-staff')">स्टाफ</button>
+            <button class="admin-tab" onclick="switchTab('tab-pride-12')">12th टॉपर्स</button>
+            <button class="admin-tab" onclick="switchTab('tab-pride-10')">10th टॉपर्स</button>
+            <button class="admin-tab" onclick="switchTab('tab-donors')">भामाशाह</button>
+            <button class="admin-tab" onclick="switchTab('tab-principals')">प्रिंसिपल्स</button>
+            
+            <button class="admin-tab" onclick="switchTab('tab-stats')">📊 आँकड़े</button>
+            <button class="admin-tab" onclick="switchTab('tab-events')">📅 इवेंट्स</button>
+            
+            <button class="admin-tab" onclick="switchTab('tab-gallery')">📸 गैलरी (Gallery)</button>
+            <button class="admin-tab" onclick="switchTab('tab-timings')">⏱ टाइमिंग</button>
+            <button class="admin-tab" onclick="switchTab('tab-settings')">न्यूज़ पट्टी</button>
+            <button class="admin-tab" style="background:#444" onclick="switchTab('tab-sync')">🔄 डेटा बैकअप / इम्पोर्ट</button>
+            <button class="btn-blue" style="background:var(--red); float:right; margin-left:auto;" onclick="closeAdmin()">Close [X]</button>
+        </div>
+
+        <div id="tab-staff" class="admin-content active">
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>नाम</th><th>आईडी</th><th>विद्यालय में कार्यग्रहण</th>
+                        <th>प्रथम नियुक्ति</th><th>सेवा निवृत्ति तिथि</th><th>पहचान/ID</th>
+                        <th>पद</th><th>DOB</th><th>नंबर</th><th>पता</th><th>फोटो (Browse)</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-staff"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('staff')" style="margin-top:2vh">+ नया स्टाफ</button>
+        </div>
+
+        <div id="tab-pride-12" class="admin-content">
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>नाम</th><th>पिता का नाम</th><th>वर्ष</th>
+                        <th>संकाय</th><th>प्रतिशत</th><th>फोटो (Browse)</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-pride-12"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('pride-12')" style="margin-top:2vh">+ नया 12th टॉपर</button>
+        </div>
+
+        <div id="tab-pride-10" class="admin-content">
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>नाम</th><th>पिता का नाम</th><th>वर्ष</th>
+                        <th>विषय</th><th>प्रतिशत</th><th>फोटो (Browse)</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-pride-10"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('pride-10')" style="margin-top:2vh">+ नया 10th टॉपर</button>
+        </div>
+
+        <div id="tab-donors" class="admin-content">
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>नाम</th><th>दान</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-donors"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('donors')" style="margin-top:2vh">+ नया भामाशाह</button>
+        </div>
+
+        <div id="tab-principals" class="admin-content">
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>नाम</th><th>से</th><th>तक</th>
+                        <th>पता</th><th>Present</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-principals"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('principals')" style="margin-top:2vh">+ नया प्रिंसिपल</button>
+        </div>
+        
+        <div id="tab-stats" class="admin-content">
+            <p style="margin-bottom: 2vh;">विद्यालय के मुख्य आँकड़े दर्ज करें (जैसे: कुल विद्यार्थी, कुल शिक्षक)।</p>
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>लेबल (Label)</th><th>संख्या (Value)</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-stats"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('stats')" style="margin-top:2vh">+ नया आँकड़ा</button>
+        </div>
+
+        <div id="tab-events" class="admin-content">
+            <p style="margin-bottom: 2vh;">आगामी कार्यक्रम और गतिविधियाँ दर्ज करें।</p>
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>कार्यक्रम का नाम</th><th>तारीख / समय</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-events"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('events')" style="margin-top:2vh">+ नया इवेंट</button>
+        </div>
+
+        <div id="tab-gallery" class="admin-content">
+            <p style="margin-bottom: 2vh;">विद्यालय दर्शन स्लाइड के लिए यहाँ मनचाही फोटो अपलोड करें।</p>
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>फोटो अपलोड करें (Browse)</th><th>फोटो का नाम / कैप्शन</th><th>एक्शन</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-gallery"></tbody>
+            </table>
+            <button class="btn-blue" onclick="addRow('gallery')" style="margin-top:2vh">+ नई फोटो</button>
+        </div>
+
+        <div id="tab-timings" class="admin-content">
+            <h3 style="color:var(--gold); margin-bottom:2vh;">स्लाइड्स रुकने का समय (सेकंड में सेट करें)</h3>
+            <div class="timing-row">
+                <label>स्वागत फोटो (Welcome Slide):</label>
+                <input type="number" id="time-welcome" class="admin-input">
+            </div>
+            <div class="timing-row">
+                <label>हमारा गौरव (Pride Slide):</label>
+                <input type="number" id="time-pride" class="admin-input">
+            </div>
+            <div class="timing-row">
+                <label>भामाशाह सूची (Donors Slide):</label>
+                <input type="number" id="time-donors" class="admin-input">
+            </div>
+            <div class="timing-row">
+                <label>विद्यालय नेतृत्व (Legacy Slide):</label>
+                <input type="number" id="time-legacy" class="admin-input">
+            </div>
+            <div class="timing-row">
+                <label>विद्यालय आँकड़े (Stats Slide):</label>
+                <input type="number" id="time-stats" class="admin-input">
+            </div>
+            <div class="timing-row">
+                <label>आगामी इवेंट्स (Events Slide):</label>
+                <input type="number" id="time-events" class="admin-input">
+            </div>
+            <div class="timing-row">
+                <label>स्टाफ डिटेल (प्रति व्यक्ति समय):</label>
+                <input type="number" id="time-staff" class="admin-input">
+            </div>
+            <div class="timing-row">
+                <label>विद्यालय दर्शन (प्रति फोटो समय):</label>
+                <input type="number" id="time-gallery" class="admin-input">
+            </div>
+            <p style="color:#aaa; font-size: 1vw;">* वीडियो स्लाइड अपने-आप वीडियो खत्म होने पर बदल जाएंगी।</p>
+        </div>
+
+        <div id="tab-settings" class="admin-content">
+            <h3 style="color:var(--gold); margin-bottom:1vh;">नीचे चलने वाली सूचना पट्टी (News Ticker) सेट करें:</h3>
+            <textarea id="newsInput" class="admin-input" style="height: 10vh; font-size: 1.2vw;"></textarea>
+        </div>
+
+        <div id="tab-sync" class="admin-content">
+            <h3 style="color:var(--gold); margin-bottom:1vh;">डेटा बैकअप (फाइल डाउनलोड / अपलोड)</h3>
+            <button class="btn-blue" style="background:#17a2b8; padding: 1.5vh 3vw;" onclick="exportDataFile()">💾 Download Backup File</button>
+            <br><br>
+            <button class="btn-blue" style="background:#e0a800; color:#000; padding: 1.5vh 3vw;" onclick="document.getElementById('backupFileInput').click()">📂 Upload File</button>
+            <input type="file" id="backupFileInput" accept=".json" onchange="importDataFile(event)">
+        </div>
+
+        <div class="admin-btns">
+            <button class="btn-blue" style="background:var(--gold); color:#000" onclick="saveAdmin()">Save Changes & Go Live</button>
+            <button class="btn-blue" style="background:var(--red)" onclick="closeAdmin()">Cancel</button>
+            <button class="btn-blue" style="background:#6610f2" onclick="exportPermanentFile()">🖥️ फाइनल HTML डाउनलोड करें</button>
+        </div>
+    </div>
+
+    <script>
+        const schoolImg = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800";
+        const storageKey = 'GSSS_MASTER_FINAL_PRO_V31';
+
+        const today = new Date();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${mm}-${dd}`;
+
+        const defaultData = {
+            staff: [
+                {
+                    name: "श्री दिनेश चंद्र जोशी", 
+                    empId: "EMP01", 
+                    schoolJoin: "2020-07-01", 
+                    firstAppt: "2010-01-01", 
+                    retire: "2045-07-31", 
+                    aadhaar: "[Aadhaar Redacted]", 
+                    role: "प्रधानाचार्य", 
+                    dob: "1987-07-09", 
+                    contact: "9876543210", 
+                    address: "ग्राम गोपीनाथ का गढ़ा, बांसवाड़ा", 
+                    img: ""
+                }
+            ],
+            donors: [
+                {name: "भामाशाह श्री ए", donation: "₹ 1,51,000"}
+            ],
+            pride12: [
+                {name: "छात्र 1", fname: "श्री पिता जी", year: "2023-24", stream: "विज्ञान", perc: "98%", img: ""}
+            ],
+            pride10: [
+                {name: "छात्र 2", fname: "श्री पिता जी", year: "2023-24", stream: "सामान्य", perc: "95%", img: ""}
+            ],
+            principals: [
+                {name: "श्री दिनेश चंद्र जोशी", code: "P01", period: "2024-Present", address: "बांसवाड़ा", isPresent: true}
+            ],
+            stats: [
+                { label: "कुल विद्यार्थी", val: "450+" },
+                { label: "कुल शिक्षक", val: "25" },
+                { label: "स्मार्ट क्लास", val: "02" },
+                { label: "परीक्षा परिणाम", val: "100%" }
+            ],
+            events: [
+                { name: "प्रथम परख परीक्षा", date: "20 अगस्त 2026" },
+                { name: "वार्षिकोत्सव", date: "26 जनवरी 2027" }
+            ],
+            gallery: [
+                {img: schoolImg, caption: "मुख्य भवन"}, 
+                {img: schoolImg, caption: "प्रार्थना सभा"}
+            ],
+            news: "राजकीय उच्च माध्यमिक विद्यालय गोपीनाथ का गढ़ा में आपका हार्दिक स्वागत है। | शिक्षा ही जीवन का आधार है。",
+            timings: { welcome: 5, pride: 10, donors: 15, legacy: 10, stats: 8, events: 10, staff: 4, gallery: 4 }
+        };
+
+        let appData = JSON.parse(localStorage.getItem(storageKey)) || defaultData;
+        
+        // Safety checks
+        if (!appData.timings) appData.timings = defaultData.timings;
+        if (!appData.gallery) appData.gallery = defaultData.gallery;
+        if (!appData.stats) appData.stats = defaultData.stats;
+        if (!appData.events) appData.events = defaultData.events;
+        
+        if (!appData.timings.gallery) appData.timings.gallery = 4;
+        if (!appData.timings.welcome) appData.timings.welcome = 5;
+        if (!appData.timings.stats) appData.timings.stats = 8;
+        if (!appData.timings.events) appData.timings.events = 10;
+
+        const permDataNode = document.getElementById('permanentData');
+        if (permDataNode && permDataNode.textContent.trim() !== '') {
+            try { 
+                appData = JSON.parse(permDataNode.textContent); 
+            } catch(e) {
+                console.error("Parse error on permanent data", e);
+            }
+        }
+
+        // --- LIVE CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clockDate').innerText = now.toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            document.getElementById('clockTime').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000); 
+        updateClock();
+
+        // --- MOUSE ACTIVITY & AUTO-HIDE LOGIC ---
+        let hideHUDTimeout;
+        
+        function showHUD() {
+            document.body.classList.add('mouse-active');
+            const hud = document.getElementById('hudContainer');
+            hud.classList.add('show');
+            
+            clearTimeout(hideHUDTimeout);
+            hideHUDTimeout = setTimeout(() => { 
+                document.body.classList.remove('mouse-active');
+                hud.classList.remove('show'); 
+            }, 3000);
+        }
+
+        document.addEventListener('mousemove', showHUD);
+        document.addEventListener('keydown', showHUD);
+
+        // --- INVISIBLE CLICK TO PLAY/PAUSE ---
+        let isMediaPaused = false;
+        
+        function togglePlayPause(e) {
+            if(e && (document.getElementById('adminPanel').style.display === 'flex' || e.target.closest('.vol-box'))) {
+                return;
+            }
+
+            let bgMusic = document.getElementById('bgMusic');
+
+            if(bgMusic.paused && !isMediaPaused && cur >= 0) {
+                let sliderVal = document.getElementById('volSlider').value / 100;
+                bgMusic.volume = sliderVal * 0.3;
+                bgMusic.play().catch(err => console.log(err));
+                
+                let activeVideo = document.querySelector('.slide.active video');
+                if(activeVideo) { 
+                    activeVideo.muted = false; 
+                    activeVideo.volume = sliderVal; 
+                    activeVideo.play(); 
+                }
+                return; 
+            }
+
+            isMediaPaused = !isMediaPaused;
+            let activeVideo = document.querySelector('.slide.active video');
+
+            if(isMediaPaused) {
+                if(activeVideo) activeVideo.pause();
+                bgMusic.pause();
+            } else {
+                if(activeVideo) activeVideo.play();
+                bgMusic.play();
+            }
+        }
+
+        function changeVolume(val) {
+            let v = val / 100;
+            document.getElementById('bgMusic').volume = v * 0.3; 
+            document.querySelectorAll('video').forEach(vid => {
+                vid.volume = v;
+            });
+            document.getElementById('volIcon').innerText = val == 0 ? "🔇" : val < 50 ? "🔉" : "🔊";
+        }
+
+        let progressTimer;
+        function startProgress(duration) {
+            clearInterval(progressTimer);
+            let bar = document.getElementById('progressBar');
+            bar.style.width = '0%';
+            
+            if(!duration || duration <= 0) return;
+            
+            let start = Date.now();
+            progressTimer = setInterval(() => {
+                if(isMediaPaused) { 
+                    start += 50; 
+                    return; 
+                }
+                let elapsed = Date.now() - start;
+                let percent = (elapsed / duration) * 100;
+                bar.style.width = Math.min(percent, 100) + '%';
+                
+                if(percent >= 100) {
+                    clearInterval(progressTimer);
+                }
+            }, 50);
+        }
+
+        // --- VIDEO ERROR HANDLER ---
+        function showVidErr(errId) {
+            let errBox = document.getElementById(errId);
+            if(errBox) {
+                errBox.style.display = 'block';
+                setTimeout(() => {
+                    errBox.style.display = 'none';
+                    nextS();
+                }, 4000);
+            }
+        }
+
+        function playVideoSafely(vidId) {
+            let v = document.getElementById(vidId);
+            if(!v) return;
+            
+            v.currentTime = 0; 
+            let sliderVal = document.getElementById('volSlider').value / 100;
+            v.volume = sliderVal;
+            v.muted = false; 
+
+            let playPromise = v.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Audio blocked. Playing muted to prevent black screen.");
+                    v.muted = true;
+                    v.play().catch(e => { console.log("Total failure: ", e); });
+                });
+            }
+            
+            v.onloadedmetadata = () => startProgress(v.duration * 1000);
+            if(v.readyState >= 1) startProgress(v.duration * 1000);
+        }
+
+        function renderUI() {
+            document.getElementById('marqueeText').innerText = appData.news || defaultData.news;
+
+            // Render Pride 12
+            let pride12HTML = appData.pride12.map(p => `
+                <div class="pride-card">
+                    <img src="${p.img || schoolImg}" onerror="this.src='${schoolImg}'">
+                    <h3>${p.name}</h3>
+                    <div class="sub-text">S/O: ${p.fname || '-'}</div>
+                    <div class="sub-text">${p.stream} | ${p.year || '-'}</div>
+                    <div class="perc">${p.perc}</div>
+                </div>
+            `).join('');
+
+            if(appData.pride12.length > 5) {
+                document.getElementById('pride12Grid').innerHTML = `<marquee scrollamount="8" behavior="scroll" direction="left"><div style="display: flex; gap: 1.5vw; padding: 0.5vh 0;">${pride12HTML}</div></marquee>`;
+            } else {
+                document.getElementById('pride12Grid').innerHTML = `<div style="display: flex; justify-content: center; gap: 1.5vw; padding: 0.5vh 0;">${pride12HTML}</div>`;
+            }
+
+            // Render Pride 10
+            let pride10HTML = appData.pride10.map(p => `
+                <div class="pride-card">
+                    <img src="${p.img || schoolImg}" onerror="this.src='${schoolImg}'">
+                    <h3>${p.name}</h3>
+                    <div class="sub-text">S/O: ${p.fname || '-'}</div>
+                    <div class="sub-text">${p.stream} | ${p.year || '-'}</div>
+                    <div class="perc">${p.perc}</div>
+                </div>
+            `).join('');
+
+            if(appData.pride10.length > 5) {
+                document.getElementById('pride10Grid').innerHTML = `<marquee scrollamount="8" behavior="scroll" direction="left"><div style="display: flex; gap: 1.5vw; padding: 0.5vh 0;">${pride10HTML}</div></marquee>`;
+            } else {
+                document.getElementById('pride10Grid').innerHTML = `<div style="display: flex; justify-content: center; gap: 1.5vw; padding: 0.5vh 0;">${pride10HTML}</div>`;
+            }
+            
+            // Render Donors
+            document.getElementById('donorList').innerHTML = appData.donors.map(d => `
+                <div class="bhamashah-card">
+                    <span class="b-name">${d.name}</span>
+                    <span class="b-amount">${d.donation}</span>
+                </div>
+            `).join('');
+
+            // Render Principals (Legacy)
+            const legacyCont = document.getElementById('legacyContainer');
+            let principalsHTML = `
+                <table class="legacy-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>क्र.</th>
+                            <th>संस्था प्रधान का नाम</th>
+                            <th>से</th>
+                            <th>तक</th>
+                            <th>पता</th>
+                        </tr>
+                    </thead>
+                    <tbody>` + 
+                    appData.principals.map((p,i) => `
+                        <tr class="${p.isPresent?'present-row':''}">
+                            <td>${i+1}</td>
+                            <td>${p.name}</td>
+                            <td>${p.code}</td>
+                            <td>${p.period}</td>
+                            <td>${p.address || '-'}</td>
+                        </tr>
+                    `).join('') + `
+                    </tbody>
+                </table>`;
+
+            if (appData.principals.length > 8) {
+                legacyCont.innerHTML = `
+                    <div class="scroll-container" style="height: 55vh; width: 100%;">
+                        <div class="scroll-box" id="legacyScrollBox" style="width: 100%;">
+                            ${principalsHTML}
+                        </div>
+                    </div>`;
+            } else {
+                legacyCont.innerHTML = principalsHTML;
+            }
+
+            // Render Stats
+            document.getElementById('statsGrid').innerHTML = appData.stats.map(s => `
+                <div class="stat-card">
+                    <div class="stat-val">${s.val}</div>
+                    <div class="stat-lbl">${s.label}</div>
+                </div>
+            `).join('');
+
+            // Render Events
+            document.getElementById('eventList').innerHTML = appData.events.map(e => `
+                <div class="event-item">
+                    <div class="event-name">${e.name}</div>
+                    <div class="event-date">${e.date}</div>
+                </div>
+            `).join('');
+
+            // Render Staff Nav
+            document.getElementById('staffNav').innerHTML = appData.staff.map((s, i) => `
+                <div class="emp-mini" id="nav-${i}">
+                    <img src="${s.img || schoolImg}" onerror="this.src='${schoolImg}'">
+                    <p>${s.name.split(' ')[0]}</p>
+                </div>
+            `).join('');
+
+            // Render Gallery (NEW UPDATE WITH CAPTION)
+            document.getElementById('galleryShowcase').innerHTML = appData.gallery.map((g, i) => `
+                <div class="gallery-item" id="gal-item-${i}">
+                    <img src="${g.img || schoolImg}" class="gallery-photo" onerror="this.src='${schoolImg}'">
+                    ${g.caption && g.caption.trim() !== '' ? `<div class="gallery-caption">${g.caption}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        let cur = -1; 
+        const totalSlides = document.querySelectorAll('.slide').length;
+        
+        function nextS() {
+            document.getElementById('v1').pause();
+            document.getElementById('v2').pause();
+            document.getElementById('v3').pause();
+			document.getElementById('v4').pause();
+            
+            isMediaPaused = false;
+
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            
+            cur = (cur + 1) % totalSlides;
+            document.getElementById('s' + cur).classList.add('active');
+            
+            let bgMusic = document.getElementById('bgMusic');
+            let sliderVal = document.getElementById('volSlider').value / 100;
+
+            if (cur === 0) {
+                bgMusic.volume = sliderVal * 0.3;
+                let time = (appData.timings.welcome || 5) * 1000;
+                startProgress(time);
+                setTimeout(nextS, time);
+            }
+            else if(cur === 1) { 
+                bgMusic.volume = sliderVal * 0.3; 
+                playVideoSafely('v1');
+            }
+            else if(cur === 6) { 
+                let staffTimePerPerson = (appData.timings.staff || 4) * 1000;
+                let totalStaffTime = (appData.staff.length * staffTimePerPerson) + 3500;
+                startProgress(totalStaffTime);
+                startStaffCycle(staffTimePerPerson); 
+            }
+            else if(cur === 7) { 
+                bgMusic.volume = sliderVal * 0.05; 
+                playVideoSafely('v2');
+            } 
+            else if(cur === 8) { 
+                bgMusic.volume = sliderVal * 0.05; 
+                playVideoSafely('v3');
+            } 
+            else if(cur === 10) { 
+                bgMusic.volume = sliderVal * 0.3; 
+                let galTimePerPhoto = (appData.timings.gallery || 4) * 1000;
+                let totalGalTime = appData.gallery.length * galTimePerPhoto;
+                if(totalGalTime === 0) totalGalTime = 5000;
+                
+                startProgress(totalGalTime);
+                startGalleryCycle(galTimePerPhoto);
+            }
+            else if(cur === 11) { 
+				bgMusic.volume = sliderVal * 0.05;
+				playVideoSafely('v4'); 
+			}
+            else {
+                bgMusic.volume = sliderVal * 0.3;
+                let time = 10000;
+                
+                if(cur === 2) time = (appData.timings.pride || 10) * 1000;
+                
+                if(cur === 3) {
+                    time = (appData.timings.donors || 15) * 1000;
+                    const scrollBox = document.getElementById('donorList');
+                    scrollBox.style.animation = 'none';
+                    scrollBox.offsetHeight; 
+                    scrollBox.style.animation = `scrollUpDynamic ${time / 1000}s linear forwards`;
+                }
+
+                if(cur === 4) {
+                    time = (appData.timings.legacy || 10) * 1000;
+                    if(appData.principals.length > 8) {
+                        time = Math.max(time, appData.principals.length * 2000); 
+                        const legacyScrollBox = document.getElementById('legacyScrollBox');
+                        if(legacyScrollBox) {
+                            legacyScrollBox.style.animation = 'none';
+                            legacyScrollBox.offsetHeight; 
+                            legacyScrollBox.style.animation = `scrollUpDynamic ${time / 1000}s linear forwards`;
+                        }
+                    }
+                }
+
+                if(cur === 5) time = (appData.timings.stats || 8) * 1000;
+                if(cur === 9) time = (appData.timings.events || 10) * 1000;
+                
+                startProgress(time);
+                setTimeout(nextS, time);
+            }
+        }
+
+        let staffInterval;
+        function startStaffCycle(staffTimePerPerson) {
+            clearInterval(staffInterval);
+            let i = 0;
+            const intro = document.getElementById('staffIntroOverlay');
+            intro.style.display = 'flex';
+            intro.style.opacity = '1';
+
+            setTimeout(() => {
+                if(cur !== 6) return;
+                intro.style.opacity = '0';
+                setTimeout(() => { intro.style.display = 'none'; }, 1000);
+
+                showStaffData(0);
+                i = 1;
+
+                staffInterval = setInterval(() => {
+                    if(isMediaPaused) return; 
+
+                    if(cur !== 6) { 
+                        clearInterval(staffInterval); 
+                        return; 
+                    }
+                    if(i >= appData.staff.length) { 
+                        clearInterval(staffInterval); 
+                        setTimeout(nextS, 2000); 
+                        return; 
+                    }
+                    showStaffData(i);
+                    i++;
+                }, staffTimePerPerson);
+            }, 3500); 
+        }
+
+        function showStaffData(index) {
+            if(!appData.staff[index]) return;
+            const s = appData.staff[index];
+            
+            document.getElementById('m-name').innerText = s.name;
+            document.getElementById('m-id').innerText = s.empId || '---';
+            document.getElementById('m-aadhaar').innerText = s.aadhaar || '---'; 
+            document.getElementById('m-role').innerText = s.role;
+            document.getElementById('m-dob').innerText = s.dob;
+            document.getElementById('m-schoolJoin').innerText = s.schoolJoin || '---';
+            document.getElementById('m-firstAppt').innerText = s.firstAppt || '---';
+            document.getElementById('m-retire').innerText = s.retire || '---';
+            document.getElementById('m-contact').innerText = s.contact || '---';
+            document.getElementById('m-address').innerText = s.address || "ग्राम गोपीनाथ का गढ़ा, बांसवाड़ा";
+            document.getElementById('m-img').src = s.img || schoolImg;
+
+            let isTodayBday = false;
+            if(s.dob) {
+                let dobParts = s.dob.split('-');
+                if(dobParts.length === 3 && dobParts[1] === mm && dobParts[2] === dd) {
+                    isTodayBday = true;
+                }
+            }
+            document.getElementById('m-bday').style.display = isTodayBday ? 'block' : 'none';
+            document.getElementById('m-img').className = isTodayBday ? 'big-img img-bday-glow' : 'big-img';
+            
+            document.getElementById('confetti-container').innerHTML = '';
+            if (isTodayBday) {
+                let colors = ['#ffcc00', '#ff3b3b', '#001d3d', '#ffffff', '#00ff00'];
+                for(let k=0; k<60; k++) {
+                    let conf = document.createElement('div');
+                    conf.className = 'confetti';
+                    conf.style.left = Math.random() * 100 + 'vw';
+                    conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    conf.style.animationDelay = (Math.random() * 2) + 's';
+                    document.getElementById('confetti-container').appendChild(conf);
+                }
+            }
+            
+            document.querySelectorAll('.emp-mini').forEach(c => c.classList.remove('active'));
+            const activeNav = document.getElementById('nav-' + index);
+
+            if (activeNav) {
+                activeNav.classList.add('active');
+
+                const navContainer = document.getElementById('staffNav');
+                if (navContainer) {
+                    const scrollPosition = activeNav.offsetLeft - (navContainer.clientWidth / 2) + (activeNav.clientWidth / 2);
+                    navContainer.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                }
+            }        
+        }
+
+        let galleryInterval;
+        function startGalleryCycle(timePerPhoto) {
+            clearInterval(galleryInterval);
+            if(appData.gallery.length === 0) {
+                setTimeout(nextS, 3000);
+                return;
+            }
+            
+            let i = 0;
+            function showPhoto(idx) {
+                document.querySelectorAll('.gallery-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                let activeItem = document.getElementById('gal-item-' + idx);
+                if(activeItem) activeItem.classList.add('active');
+            }
+            
+            showPhoto(0);
+            i = 1;
+            
+            galleryInterval = setInterval(() => {
+                if(isMediaPaused) return; 
+                
+                if(cur !== 10) { 
+                    clearInterval(galleryInterval); 
+                    return; 
+                }
+                if(i >= appData.gallery.length) { 
+                    clearInterval(galleryInterval); 
+                    setTimeout(nextS, 1000); 
+                    return; 
+                }
+                showPhoto(i);
+                i++;
+            }, timePerPhoto);
+        }
+
+        function handleImageUpload(event, inputHiddenId, previewImgId) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1920; 
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    document.getElementById(inputHiddenId).value = compressedDataUrl;
+                    document.getElementById(previewImgId).src = compressedDataUrl;
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function moveRowUp(btn) {
+            const row = btn.closest('tr');
+            if (row.previousElementSibling) {
+                row.parentNode.insertBefore(row, row.previousElementSibling);
+            }
+        }
+
+        function moveRowDown(btn) {
+            const row = btn.closest('tr');
+            if (row.nextElementSibling) {
+                row.parentNode.insertBefore(row.nextElementSibling, row);
+            }
+        }
+
+        function openAdmin() { 
+            populateTables(); 
+            document.getElementById('adminPanel').style.display = 'flex'; 
+        }
+        
+        function closeAdmin() { 
+            document.getElementById('adminPanel').style.display = 'none'; 
+        }
+        
+        function switchTab(id) {
+            document.querySelectorAll('.admin-tab, .admin-content').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(id).classList.add('active');
+        }
+
+        function populateTables() {
+            const actionBtns = `<td style="white-space: nowrap;">
+                <button class="btn-blue" style="background:#28a745; padding:0.5vh 0.8vw;" title="ऊपर करें" onclick="moveRowUp(this)">▲</button>
+                <button class="btn-blue" style="background:#ffc107; padding:0.5vh 0.8vw; color:#000;" title="नीचे करें" onclick="moveRowDown(this)">▼</button>
+                <button class="btn-blue" style="background:var(--red); padding:0.5vh 1vw;" title="डिलीट करें" onclick="this.closest('tr').remove()">X</button>
+            </td>`;
+            
+            document.getElementById('time-welcome').value = appData.timings.welcome || 5;
+            document.getElementById('time-pride').value = appData.timings.pride || 10;
+            document.getElementById('time-donors').value = appData.timings.donors || 15;
+            document.getElementById('time-legacy').value = appData.timings.legacy || 10;
+            document.getElementById('time-stats').value = appData.timings.stats || 8;
+            document.getElementById('time-events').value = appData.timings.events || 10;
+            document.getElementById('time-staff').value = appData.timings.staff || 4;
+            document.getElementById('time-gallery').value = appData.timings.gallery || 4;
+
+            document.getElementById('newsInput').value = appData.news || defaultData.news;
+
+            document.getElementById('tbody-staff').innerHTML = appData.staff.map((s, i) => `
+                <tr>
+                    <td><input class="admin-input" value="${s.name}"></td>
+                    <td><input class="admin-input" value="${s.empId}"></td>
+                    <td><input type="date" class="admin-input" value="${s.schoolJoin || ''}"></td>
+                    <td><input type="date" class="admin-input" value="${s.firstAppt || ''}"></td>
+                    <td><input type="date" class="admin-input" value="${s.retire || ''}"></td>
+                    <td><input class="admin-input" value="${s.aadhaar || ''}" placeholder="ID"></td>
+                    <td><input class="admin-input" value="${s.role}"></td>
+                    <td><input type="date" class="admin-input" value="${s.dob}"></td>
+                    <td><input class="admin-input" value="${s.contact}"></td>
+                    <td><input class="admin-input" value="${s.address}"></td>
+                    <td>
+                        <img src="${s.img || schoolImg}" class="img-preview" id="prev-staff-${i}">
+                        <input type="hidden" class="img-hidden" value="${s.img}" id="hid-staff-${i}">
+                        <input type="file" accept="image/*" class="file-upload-btn" onchange="handleImageUpload(event, 'hid-staff-${i}', 'prev-staff-${i}')">
+                    </td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+
+            document.getElementById('tbody-pride-12').innerHTML = appData.pride12.map((p, i) => `
+                <tr>
+                    <td><input class="admin-input" value="${p.name}"></td>
+                    <td><input class="admin-input" value="${p.fname || ''}"></td>
+                    <td><input class="admin-input" value="${p.year || ''}"></td>
+                    <td><input class="admin-input" value="${p.stream}"></td>
+                    <td><input class="admin-input" value="${p.perc}"></td>
+                    <td>
+                        <img src="${p.img || schoolImg}" class="img-preview" id="prev-p12-${i}">
+                        <input type="hidden" class="img-hidden" value="${p.img}" id="hid-p12-${i}">
+                        <input type="file" accept="image/*" class="file-upload-btn" onchange="handleImageUpload(event, 'hid-p12-${i}', 'prev-p12-${i}')">
+                    </td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+
+            document.getElementById('tbody-pride-10').innerHTML = appData.pride10.map((p, i) => `
+                <tr>
+                    <td><input class="admin-input" value="${p.name}"></td>
+                    <td><input class="admin-input" value="${p.fname || ''}"></td>
+                    <td><input class="admin-input" value="${p.year || ''}"></td>
+                    <td><input class="admin-input" value="${p.stream}"></td>
+                    <td><input class="admin-input" value="${p.perc}"></td>
+                    <td>
+                        <img src="${p.img || schoolImg}" class="img-preview" id="prev-p10-${i}">
+                        <input type="hidden" class="img-hidden" value="${p.img}" id="hid-p10-${i}">
+                        <input type="file" accept="image/*" class="file-upload-btn" onchange="handleImageUpload(event, 'hid-p10-${i}', 'prev-p10-${i}')">
+                    </td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+
+            document.getElementById('tbody-donors').innerHTML = appData.donors.map((d, i) => `
+                <tr>
+                    <td><input class="admin-input" value="${d.name}"></td>
+                    <td><input class="admin-input" value="${d.donation}"></td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+
+            document.getElementById('tbody-principals').innerHTML = appData.principals.map((p, i) => `
+                <tr>
+                    <td><input class="admin-input" value="${p.name}"></td>
+                    <td><input class="admin-input" value="${p.code}"></td>
+                    <td><input class="admin-input" value="${p.period}"></td>
+                    <td><input class="admin-input" value="${p.address || ''}"></td>
+                    <td><input type="checkbox" style="transform:scale(1.5)" ${p.isPresent?'checked':''}></td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+            
+            document.getElementById('tbody-stats').innerHTML = appData.stats.map((s, i) => `
+                <tr>
+                    <td><input class="admin-input" value="${s.label}"></td>
+                    <td><input class="admin-input" value="${s.val}"></td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+
+            document.getElementById('tbody-events').innerHTML = appData.events.map((e, i) => `
+                <tr>
+                    <td><input class="admin-input" value="${e.name}"></td>
+                    <td><input class="admin-input" value="${e.date}"></td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+
+            // Populate Gallery Table
+            document.getElementById('tbody-gallery').innerHTML = appData.gallery.map((g, i) => `
+                <tr>
+                    <td>
+                        <img src="${g.img || schoolImg}" class="img-preview" id="prev-gal-${i}">
+                        <input type="hidden" class="img-hidden" value="${g.img}" id="hid-gal-${i}">
+                        <input type="file" accept="image/*" class="file-upload-btn" onchange="handleImageUpload(event, 'hid-gal-${i}', 'prev-gal-${i}')">
+                    </td>
+                    <td><input class="admin-input" placeholder="कैप्शन (वैकल्पिक)" value="${g.caption || ''}"></td>
+                    ${actionBtns}
+                </tr>
+            `).join('');
+        }
+
+        function addRow(type) {
+            const actionBtns = `<td style="white-space: nowrap;">
+                <button class="btn-blue" style="background:#28a745; padding:0.5vh 0.8vw;" title="ऊपर करें" onclick="moveRowUp(this)">▲</button>
+                <button class="btn-blue" style="background:#ffc107; padding:0.5vh 0.8vw; color:#000;" title="नीचे करें" onclick="moveRowDown(this)">▼</button>
+                <button class="btn-blue" style="background:var(--red); padding:0.5vh 1vw;" title="डिलीट करें" onclick="this.closest('tr').remove()">X</button>
+            </td>`;
+            const randId = Math.floor(Math.random() * 10000);
+            const uploadHtml = `
+                <img src="${schoolImg}" class="img-preview" id="prev-${randId}">
+                <input type="hidden" class="img-hidden" value="" id="hid-${randId}">
+                <input type="file" accept="image/*" class="file-upload-btn" onchange="handleImageUpload(event, 'hid-${randId}', 'prev-${randId}')">
+            `;
+            
+            let html = '';
+            if(type==='staff') {
+                html = `<tr>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input"></td>
+                    <td><input type="date" class="admin-input"></td>
+                    <td><input type="date" class="admin-input"></td>
+                    <td><input type="date" class="admin-input"></td>
+                    <td><input class="admin-input" placeholder="ID"></td>
+                    <td><input class="admin-input"></td>
+                    <td><input type="date" class="admin-input"></td>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input"></td>
+                    <td>${uploadHtml}</td>
+                    ${actionBtns}
+                </tr>`;
+            } else if(type==='pride-12' || type==='pride-10') {
+                html = `<tr>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input" placeholder="पिता का नाम"></td>
+                    <td><input class="admin-input" placeholder="वर्ष"></td>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input"></td>
+                    <td>${uploadHtml}</td>
+                    ${actionBtns}
+                </tr>`;
+            } else if(type==='donors') {
+                html = `<tr>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input"></td>
+                    ${actionBtns}
+                </tr>`;
+            } else if(type==='principals') {
+                html = `<tr>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input"></td>
+                    <td><input class="admin-input" placeholder="पता"></td>
+                    <td><input type="checkbox" style="transform:scale(1.5)"></td>
+                    ${actionBtns}
+                </tr>`;
+            } else if(type==='stats') {
+                html = `<tr>
+                    <td><input class="admin-input" placeholder="लेबल"></td>
+                    <td><input class="admin-input" placeholder="संख्या"></td>
+                    ${actionBtns}
+                </tr>`;
+            } else if(type==='events') {
+                html = `<tr>
+                    <td><input class="admin-input" placeholder="कार्यक्रम का नाम"></td>
+                    <td><input class="admin-input" placeholder="तारीख"></td>
+                    ${actionBtns}
+                </tr>`;
+            } else if (type === 'gallery') {
+                html = `<tr>
+                    <td>${uploadHtml}</td>
+                    <td><input class="admin-input" placeholder="कैप्शन (वैकल्पिक)"></td>
+                    ${actionBtns}
+                </tr>`;
+            }
+            document.getElementById('tbody-'+type).insertAdjacentHTML('beforeend', html);
+        }
+
+        function saveAdmin() {
+            appData.timings = {
+                welcome: parseInt(document.getElementById('time-welcome').value) || 5,
+                pride: parseInt(document.getElementById('time-pride').value) || 10,
+                donors: parseInt(document.getElementById('time-donors').value) || 15,
+                legacy: parseInt(document.getElementById('time-legacy').value) || 10,
+                stats: parseInt(document.getElementById('time-stats').value) || 8,
+                events: parseInt(document.getElementById('time-events').value) || 10,
+                staff: parseInt(document.getElementById('time-staff').value) || 4,
+                gallery: parseInt(document.getElementById('time-gallery').value) || 4
+            };
+
+            appData.staff = Array.from(document.querySelectorAll('#tbody-staff tr')).map(tr => { 
+                const inp = tr.querySelectorAll('.admin-input'); 
+                const hidImg = tr.querySelector('.img-hidden').value;
+                return {
+                    name: inp[0].value, empId: inp[1].value, schoolJoin: inp[2].value, firstAppt: inp[3].value, retire: inp[4].value, aadhaar: inp[5].value, role: inp[6].value, dob: inp[7].value, contact: inp[8].value, address: inp[9].value, img: hidImg
+                }; 
+            });
+
+            appData.pride12 = Array.from(document.querySelectorAll('#tbody-pride-12 tr')).map(tr => { 
+                const inp = tr.querySelectorAll('.admin-input'); 
+                const hidImg = tr.querySelector('.img-hidden').value;
+                return { name: inp[0].value, fname: inp[1].value, year: inp[2].value, stream: inp[3].value, perc: inp[4].value, img: hidImg }; 
+            });
+
+            appData.pride10 = Array.from(document.querySelectorAll('#tbody-pride-10 tr')).map(tr => { 
+                const inp = tr.querySelectorAll('.admin-input'); 
+                const hidImg = tr.querySelector('.img-hidden').value;
+                return { name: inp[0].value, fname: inp[1].value, year: inp[2].value, stream: inp[3].value, perc: inp[4].value, img: hidImg }; 
+            });
+
+            appData.donors = Array.from(document.querySelectorAll('#tbody-donors tr')).map(tr => { 
+                const inp = tr.querySelectorAll('.admin-input'); 
+                return { name: inp[0].value, donation: inp[1].value }; 
+            });
+
+            appData.principals = Array.from(document.querySelectorAll('#tbody-principals tr')).map(tr => { 
+                const inp = tr.querySelectorAll('.admin-input'); 
+                const chk = tr.querySelector('input[type="checkbox"]'); 
+                return { name: inp[0].value, code: inp[1].value, period: inp[2].value, address: inp[3].value, isPresent: chk.checked }; 
+            });
+            
+            appData.stats = Array.from(document.querySelectorAll('#tbody-stats tr')).map(tr => { 
+                const inp = tr.querySelectorAll('.admin-input'); 
+                return { label: inp[0].value, val: inp[1].value }; 
+            });
+
+            appData.events = Array.from(document.querySelectorAll('#tbody-events tr')).map(tr => { 
+                const inp = tr.querySelectorAll('.admin-input'); 
+                return { name: inp[0].value, date: inp[1].value }; 
+            });
+
+            appData.gallery = Array.from(document.querySelectorAll('#tbody-gallery tr')).map(tr => { 
+                const hidImg = tr.querySelector('.img-hidden').value;
+                const captionInput = tr.querySelector('.admin-input').value; // caption is the only visible admin-input
+                return { img: hidImg, caption: captionInput }; 
+            });
+
+            appData.news = document.getElementById('newsInput').value;
+
+            localStorage.setItem(storageKey, JSON.stringify(appData));
+            renderUI();
+            closeAdmin();
+            alert("डेटा लाइव सेव हो गया!");
+        }
+
+        function exportDataFile() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "GSSS_Backup_Data.json");
+            dlAnchorElem.click();
+        }
+
+        function importDataFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    appData = JSON.parse(e.target.result);
+                    localStorage.setItem(storageKey, JSON.stringify(appData));
+                    renderUI();
+                    alert("डेटा सफलतापूर्वक अपलोड और अपडेट हो गया है!");
+                    closeAdmin();
+                } catch(error) { 
+                    alert("फ़ाइल गलत है या करप्ट हो गई है!"); 
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportPermanentFile() {
+            document.getElementById('permanentData').textContent = JSON.stringify(appData);
+            let htmlClone = document.documentElement.cloneNode(true);
+            htmlClone.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            
+            htmlClone.querySelector('#adminPanel').style.display = 'none';
+            
+            let html = "<!DOCTYPE html>\n" + htmlClone.outerHTML;
+            let blob = new Blob([html], {type: "text/html"});
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "GSSS_TV_FINAL.html";
+            a.click();
+        }
+
+        function toggleFullScreen() { 
+            if(!document.fullscreenElement) { 
+                document.documentElement.requestFullscreen(); 
+            } else { 
+                document.exitFullscreen(); 
+            }
+        }
+
+        renderUI();
+        nextS();
+	
+	// कीबोर्ड की मदद से स्लाइड स्किप करने के लिए
+document.addEventListener('keydown', function(event) {
+    if (event.code === 'Space') { // Space दबाते ही अगली स्लाइड
+        nextS();
+    }
+});
+    </script>
+</body>
+</html>
